@@ -7,6 +7,7 @@ import {
 } from "firebase/storage";
 import { useRef, useState, useEffect } from "react";
 import { app } from "../firebase";
+import { Link } from "react-router-dom";
 import {
   updateUserStart,
   updateUserSuccess,
@@ -178,6 +179,12 @@ export default function Profile() {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link
+          className="bg-green-700 p-3 text-white uppercase text-center hover:opacity-95 rounded-lg"
+          to={"/create-listing"}
+        >
+          Create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
