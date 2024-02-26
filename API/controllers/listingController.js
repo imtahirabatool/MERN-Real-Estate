@@ -28,11 +28,12 @@ export const deleteListing = async (req, res, next) => {
   }
 };
 
-// Fetch user listings
 export const getUserListings = async (req, res, next) => {
   try {
-    // Assuming userRef is stored in the listing document
-    const listings = await Listing.find({ userRef: req.params.userId });
+    const listings = await Listing.findById({ userRef: req.params._id });
+    if (!listings) {
+      return next(errorHandler(404, "Listing not found!"));
+    }
     res.status(200).json(listings);
   } catch (error) {
     next(error);
@@ -56,5 +57,14 @@ export const updateListing = async () => {
     res.status(200).json(updatedListing);
   } catch (error) {
     next(error);
+  }
+};
+
+export const getAllListings = async (req, res, next) => {
+  try {
+    const listings = await Listing.find(); // Retrieve all listings from the database
+    res.status(200).json(listings); // Send the listings as a JSON response
+  } catch (error) {
+    next(error); // Pass any errors to the error handling middleware
   }
 };
