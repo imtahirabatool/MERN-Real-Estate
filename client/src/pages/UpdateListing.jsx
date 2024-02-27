@@ -9,7 +9,7 @@ import { app } from "../firebase.js";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function CreateListing() {
+export default function UpdateListing() {
   const { currUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const params = useParams();
@@ -23,30 +23,27 @@ export default function CreateListing() {
     address: "",
     description: "",
     type: "rent",
-    bedrooms: 1,
-    bathrooms: 1,
-    regularPrice: 50,
-    discountPrice: 0,
+    bedrooms: 1, // Change from "1" to 1
+    bathrooms: 1, // Change from "1" to 1
+    regularPrice: 50, // Change from "50" to 50
+    discountPrice: 0, // Change from "0" to 0
     offer: false,
     parking: false,
     furnished: false,
   });
+
   const [imageUploadError, setImageUploadError] = useState(false);
 
   useEffect(() => {
     const fetchListing = async () => {
-      try {
-        const listingId = params.listingId;
-        const res = await fetch(`/api/listing/get/${listingId}`);
-        const data = await res.json();
-        if (data.success === false) {
-          console.log(data.message);
-          return;
-        }
-        setFormData(data);
-      } catch (error) {
-        console.error("Error fetching listing:", error);
+      const listingId = params.listingId;
+      const res = await fetch(`/api/listing/get/${listingId}`);
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
       }
+      setFormData(data);
     };
     fetchListing();
   }, [params.listingId]);
@@ -62,10 +59,10 @@ export default function CreateListing() {
       }
       Promise.all(promises)
         .then((urls) => {
-          setFormData({
-            ...formData,
-            imageUrls: formData.imageUrls.concat(urls),
-          });
+          setFormData((prevData) => ({
+            ...prevData,
+            imageUrls: prevData.imageUrls.concat(urls),
+          }));
           setImageUploadError(false);
           setUploading(false);
         })
@@ -107,35 +104,30 @@ export default function CreateListing() {
   };
 
   const handleDeleteImage = (index) => {
-    setFormData({
-      ...formData,
-      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
-    });
+    setFormData((prevData) => ({
+      ...prevData,
+      imageUrls: prevData.imageUrls.filter((_, i) => i !== index),
+    }));
   };
+
   const handleChange = (e) => {
-    if (e.target.id === "sale" || e.target.id === "rent") {
-      setFormData({
-        ...formData,
-        type: e.target.id,
-      });
-    } else if (
-      e.target.id === "parking" ||
-      e.target.id === "furnished" ||
-      e.target.id === "offer"
-    ) {
-      setFormData({
-        ...formData,
-        [e.target.id]: e.target.checked,
-      });
-    } else if (
-      e.target.type === "number" ||
-      e.target.type === "text" ||
-      e.target.type === "textarea"
-    ) {
-      setFormData({
-        ...formData,
-        [e.target.id]: e.target.value,
-      });
+    const { id, type, checked, value } = e.target;
+
+    if (id === "sale" || id === "rent") {
+      setFormData((prevData) => ({
+        ...prevData,
+        type: id,
+      }));
+    } else if (id === "parking" || id === "furnished" || id === "offer") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [id]: checked,
+      }));
+    } else if (type === "number" || type === "text" || type === "textarea") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [id]: value,
+      }));
     }
   };
 
@@ -169,6 +161,7 @@ export default function CreateListing() {
       setLoading(false);
     }
   };
+
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7 ">
@@ -329,12 +322,13 @@ export default function CreateListing() {
           </p>
           <div className="flex gap-4">
             <input
-              onChange={(e) => setFiles(e.target.files)}
+              onChange={(e) => e.target.files && setFiles(e.target.files)}
               type="file"
               multiple
               className="p-3 border border-gray-300 rounded w-full"
               id="images"
             />
+
             <button
               onClick={handleImageSubmit}
               disabled={uploading}
@@ -346,15 +340,15 @@ export default function CreateListing() {
           <p className="text-red-700 text-sm">
             {imageUploadError && imageUploadError}
           </p>
-          {formData.imageUrls.length > 0 &&
+          {formData.imageUrls?.length > 0 &&
             formData.imageUrls.map((url, index) => (
               <div
-                className="flex justify-between p-3 border items-center"
                 key={url}
+                className="flex justify-between p-3 border items-center"
               >
                 <img
                   src={url}
-                  alt="listing map"
+                  alt="listing image"
                   className="w-20 h-20 object-contain rounded-lg"
                 />
                 <button
@@ -370,7 +364,7 @@ export default function CreateListing() {
             disabled={loading || uploading}
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? "Updating..." : "Update Listing"}
+            {loading ? "Creating..." : "Update Listing"}
           </button>
           {error && <p className=" text-red-700 text-sm">{error}</p>}
         </div>

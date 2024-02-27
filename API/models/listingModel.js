@@ -40,18 +40,19 @@ const listingSchema = new mongoose.Schema(
     },
     type: {
       type: String,
+      enum: ["sale", "rent"], // Make sure the type is one of these values
       required: true,
     },
-    offers: {
+    offer: {
       type: Boolean,
-      required: false,
+      required: false, // Not mandatory
     },
     imageUrls: {
-      type: Array,
+      type: [String], // Array of image URLs
       required: true,
     },
     userRef: {
-      type: String,
+       type: String,
       required: true,
     },
   },

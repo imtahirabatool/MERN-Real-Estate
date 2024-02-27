@@ -30,11 +30,11 @@ export const deleteListing = async (req, res, next) => {
 
 export const getUserListings = async (req, res, next) => {
   try {
-    const listings = await Listing.findById({ userRef: req.params._id });
+    const listings = await Listing.find({ userRef: req.params.id });
     if (!listings) {
       return next(errorHandler(404, "Listing not found!"));
     }
-    res.status(200).json(listings);
+    res.status(200).json({ success: true, listings: listings });
   } catch (error) {
     next(error);
   }
