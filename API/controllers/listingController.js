@@ -28,19 +28,31 @@ export const deleteListing = async (req, res, next) => {
   }
 };
 
-export const getUserListings = async (req, res, next) => {
+// export const getUserListings = async (req, res, next) => {
+//   try {
+//     const listings = await Listing.findById(req.params.id);
+//     if (!listings) {
+//       return next(errorHandler(404, "Listing not found!"));
+//     }
+//     res.status(200).json({ success: true, listings: listings });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+export const getSingleListing = async (req, res, next) => {
   try {
-    const listings = await Listing.find({ userRef: req.params.id });
-    if (!listings) {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) {
       return next(errorHandler(404, "Listing not found!"));
     }
-    res.status(200).json({ success: true, listings: listings });
+    res.status(200).json(listing);
   } catch (error) {
-    next(error);
+    return next(errorHandler(404, "Listing not found!"));
   }
 };
 
-export const updateListing = async () => {
+export const updateListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
   if (!listing) {
     return next(errorHandler(404, "Listing not found!"));
@@ -59,7 +71,6 @@ export const updateListing = async () => {
     next(error);
   }
 };
-
 export const getAllListings = async (req, res, next) => {
   try {
     const listings = await Listing.find(); // Retrieve all listings from the database
