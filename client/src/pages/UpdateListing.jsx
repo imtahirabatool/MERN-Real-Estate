@@ -46,7 +46,8 @@ export default function CreateListing() {
       setFormData(data);
     };
     fetchListing();
-  });
+  }, [params.listingId]); // Add params.listingId to the dependency array
+
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -150,7 +151,7 @@ export default function CreateListing() {
         return setError("Discount price must be lower than regular price");
       setLoading(true);
       setError(false);
-      const res = await fetch("/api/listing/create", {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
