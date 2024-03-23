@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ListingItems from "../components/listingItems";
 
 export default function Search() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [listings, setListings] = useState(false);
+  const [listings, setListings] = useState([]);
   const [sidebardata, setSidebardata] = useState({
     searchTerm: "",
     type: "all",
@@ -14,7 +15,7 @@ export default function Search() {
     sort: "created_at",
     order: "desc",
   });
-  console.log(listings);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
@@ -44,14 +45,21 @@ export default function Search() {
         order: orderFromUrl || "desc",
       });
     }
+
     const fetchListings = async () => {
-      setLoading(false);
-      const searchQuery = urlParams.toString();
-      const res = await fetch(`/api/listing/get?${searchQuery}`);
-      const data = await res.json();
-      setListings(data);
-      setLoading(false);
+      setLoading(true);
+      try {
+        const searchQuery = urlParams.toString();
+        const res = await fetch(`/api/listing/get?${searchQuery}`);
+        const data = await res.json();
+        setListings(data);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchListings();
   }, [location.search]);
 
@@ -200,10 +208,25 @@ export default function Search() {
           </button>
         </form>
       </div>
-      <div className="">
+      <div className="flex-1">
         <h1 className="text-3xl font-semibold border-b p-3 text-slate-700 mt-5">
           Listing Results
         </h1>
+        <div className="p-7 flex flex-wrap gap-4">
+          {!loading && listings.length === 0 && (
+            <p className="text-xl text-slate-700">No Listing found!</p>
+          )}
+          {loading && (
+            <p className="text-xl text-slate-700 text-center w-full">
+              Loading...
+            </p>
+          )}
+          {!loading &&
+            listings &&
+            listings.map((listing) => (
+              <ListingItems key={listing._id} listing={listing} />
+            ))}
+        </div>
       </div>
     </div>
   );
