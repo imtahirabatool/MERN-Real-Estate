@@ -23,7 +23,7 @@ import {
 export default function Profile() {
   const fileRef = useRef(null);
   const { currUser, loading, error } = useSelector((state) => state.user);
-  const [file, setFile] = useState(undefined);
+  const [file, setFile] = useState(null);
   const [userListings, setUserListings] = useState([]);
   const [showListingError, setShowListingError] = useState(false);
   const [filePerc, setFilePerc] = useState(0);
@@ -32,15 +32,12 @@ export default function Profile() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const dispatch = useDispatch();
 
-  //firebase storage
-  // allow read;
-  // allow write: if request.resource.size < 2 * 1024 * 1024 && request.resource.contentType.matches('image/.*');
-
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
   }, [file]);
+
   const handleFileUpload = (file) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + file.name;
@@ -58,16 +55,19 @@ export default function Profile() {
         setFileUploadError(true);
       },
       () => {
-        // This function is called when the upload is complete
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setFormData({ ...formData, avatar: downloadURL });
-        });
+        getDownloadURL(uploadTask.snapshot.ref)
+          .then((downloadURL) => {
+            setFormData((prev) => ({ ...prev, avatar: downloadURL }));
+          })
+          .catch((error) => {
+            console.error("Error getting download URL:", error);
+          });
       }
     );
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -109,6 +109,7 @@ export default function Profile() {
       dispatch(deleteUserFailure(error.message));
     }
   };
+
   const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
@@ -120,9 +121,10 @@ export default function Profile() {
       }
       dispatch(signOutUserSuccess(data));
     } catch (error) {
-      dispatch(signOutUserFailure(data.message));
+      dispatch(signOutUserFailure(error.message));
     }
   };
+
   const handleSubmitListing = async () => {
     try {
       setShowListingError(false);
@@ -132,10 +134,10 @@ export default function Profile() {
         setShowListingError(true);
         return;
       }
-
       setUserListings(data);
     } catch (error) {
       setShowListingError(true);
+      console.error("Error fetching listings:", error);
     }
   };
 
@@ -146,15 +148,14 @@ export default function Profile() {
       });
       const data = await res.json();
       if (data.success === false) {
-        console.log(data.message);
+        console.error("Error deleting listing:", data.message);
         return;
       }
-
       setUserListings((prev) =>
         prev.filter((listing) => listing._id !== listingId)
       );
     } catch (error) {
-      console.log(error);
+      console.error("Error deleting listing:", error);
     }
   };
   return (
