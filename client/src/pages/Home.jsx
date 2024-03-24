@@ -11,7 +11,6 @@ export default function Home() {
   const [saleListings, setSaleListings] = useState([]);
   const [rentListings, setRentListings] = useState([]);
   SwiperCore.use([Navigation]);
-  console.log(saleListings);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -74,11 +73,10 @@ export default function Home() {
       <Swiper navigation>
         {offerListings &&
           offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide>
+          offerListings.map((listing, index) => (
+            <SwiperSlide key={index}>
               <div
                 className="h-[500px]"
-                key={listing._id}
                 style={{
                   background: `url(${listing.imageUrls[0]}) center no-repeat`,
                   backgroundSize: "cover",

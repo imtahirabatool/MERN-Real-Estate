@@ -28,7 +28,9 @@ export default function Profile() {
   const [showListingError, setShowListingError] = useState(false);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    avatar: localStorage.getItem("profilePicture") || currUser.avatar, // Set initial value for avatar from localStorage or currUser.avatar
+  });
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const dispatch = useDispatch();
 
@@ -58,6 +60,8 @@ export default function Profile() {
         getDownloadURL(uploadTask.snapshot.ref)
           .then((downloadURL) => {
             setFormData((prev) => ({ ...prev, avatar: downloadURL }));
+            // Store the URL in localStorage
+            localStorage.setItem("profilePicture", downloadURL);
           })
           .catch((error) => {
             console.error("Error getting download URL:", error);
@@ -158,6 +162,7 @@ export default function Profile() {
       console.error("Error deleting listing:", error);
     }
   };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
