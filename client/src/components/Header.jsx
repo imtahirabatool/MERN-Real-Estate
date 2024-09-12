@@ -5,6 +5,9 @@ import { useSelector } from "react-redux";
 
 export default function Header() {
   const { currUser } = useSelector((state) => state.user);
+  const [formData, setFormData] = useState({
+    avatar: localStorage.getItem("profilePicture") || currUser.avatar, // Set initial value for avatar from localStorage or currUser.avatar
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const handleSubmit = (e) => {
@@ -62,7 +65,7 @@ export default function Header() {
             {currUser ? (
               <img
                 className="rounded-full h-7 w-7 object-cover"
-                src={currUser.avatar}
+                src={formData?.avatar || currUser.avatar}
                 alt="profile"
               />
             ) : (

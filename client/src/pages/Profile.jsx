@@ -252,7 +252,7 @@ export default function Profile() {
         Show Listings
       </button>
       <p className="text-red-700 mt-5">
-        {showListingError ? "erro showing listings" : ""}
+        {showListingError ? "error showing listings" : ""}
       </p>
       {userListings && userListings.length > 0 && (
         <div className="flex flex-col gap-4">
